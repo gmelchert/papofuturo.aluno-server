@@ -17,7 +17,7 @@ const router = express.Router()
 
 router.get('/:cpf', async (req, res) => {
     const
-        cpf = req.params.cpf.replaceAll('.', '').replace('-', ''),
+        cpf = req.params.cpf,
         table = 'cadastro',
         specificfiltersObjects = { cpf, admin: 0 },
         filter = { req, table, specificfiltersObjects }
@@ -35,27 +35,40 @@ router.post('', async (req, res) => {
         rg,
         fone,
         email,
-        idade,
         sobrenome,
         nome,
-        confirmarSenha,
-        senha
+        confirmarsenha,
+        senha,
+        numero,
+        bairro,
+        logradouro,
+        complemento,
+        dt_nasc
     } = req.body
 
-    if (confirmarSenha !== senha) return error(res, 'As senhas estão diferentes.')
+    const keys = Object.keys(req.body)
 
-    if (Object.values(req.body).some(val => !val)) return error(res, 'Todos os campos são obrigatórios.')
+    if (confirmarsenha !== senha) return error(res, 'As senhas estão diferentes.')
+
+    const canBeNull = ['bairro', 'complemento']
+
+    if (Object.values(req.body).filter((val, index) => !canBeNull.includes(keys[index])).some(val => !val)) return error(res, 'Todos os campos são obrigatórios.')
     const
         table = 'cadastro',
         values = {
-            cpf: cpf.replaceAll('.', '').replace('-', ''),
+            cpf,
             rg,
             fone,
             email,
-            idade,
             sobrenome,
             nome,
-            senha
+            senha,
+            admin: 0,
+            numero,
+            bairro,
+            logradouro,
+            complemento,
+            dt_nasc
         },
         md5Values = ['senha']
 

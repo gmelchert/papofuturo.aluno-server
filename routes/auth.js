@@ -1,7 +1,6 @@
 import express from "express"
 import { utilsDb } from "../database/utils.js"
 import { utilsRoutes } from './utils.js'
-import API from '../external/externalsAPI.js'
 import messages from './utilsMessages.js'
 
 const {
@@ -16,27 +15,26 @@ const {
 
 const router = express.Router()
 
-router.get('/', async (req, res) => {
+router.post('/', async (req, res) => {
+    const { cpf, password } = req.body
+
     const
-        limit = req.query.page_limit || 20,
-        table = '', 
-        pagination = { req, limit },
-        include = [{ col: '', table: '' }],
-        specificfiltersObjects = {},
-        filter = { req, table, specificfiltersObjects }
+        table = 'cadastro',
+        filter = `where cpf = "${cpf}" and senha = MD5("${password}")`
 
     utilsDb.get({
         table,
         filter,
-        pagination,
-        include,
-
-    }).then(result => ok(res, result))
+    }).then(({ rows }) => {
+        rows.length == 1
+            ? ok(res, { message: 'Login realizado com sucesso' } )
+            : error(res, 'CPF ou senha inválidos.')
+    })
     .catch(err => error(res, fail.query, err))
 })
 
 const exportRouter = [
-    app => app.use('/', router)
+    app => app.use('/auth', router)
 ]
 
 export default exportRouter

@@ -13,6 +13,7 @@ async function connect(config) {
 }
 
 async function exec({ sql, values }) {
+    console.log(sql)
     return new Promise(async (resolve, reject) => {
         const conn = await connect(dbAdmin)
         if (!conn) return reject('Não conectou ao banco.')
